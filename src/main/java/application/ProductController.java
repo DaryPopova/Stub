@@ -1,44 +1,41 @@
 package application;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ProductController {
 
     DataKeeper dataKeeper = new DataKeeper();
 
-    @RequestMapping("/addProduct")
-    public Answer addProduct(@RequestParam(value="id", required=false) Integer id,
-                           @RequestParam(value="name", required=false) String name,
-                           @RequestParam(value="price", required=false) Double price){
+    @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
+    public ResponseEntity<JsonObject> addProduct(@RequestBody Product product){
         try {
-            if ((id == null) || (name == null) || (price == null)) {
-                return new Answer(400, "Bad Request");
+            if ((product.getId() == null) || (product.getName() == null) || (product.getPrice() == null)) {
+                return new ResponseEntity<>(new Answer(400, "Bad Request"), HttpStatus.BAD_REQUEST);
             }
-            dataKeeper.addProduct(id, name, price);
-            return new Answer(200, "success");
+            dataKeeper.addProduct(product);
+            return new ResponseEntity<>(new Answer(200, "success"), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e);
-            return new Answer(500, "Internal Server Error");
+            return new ResponseEntity<>(new Answer(500, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @RequestMapping("/getProduct")
-    public JsonObject getProduct(@RequestParam(value="id", required=false) Integer id) throws Exception {
+    public ResponseEntity<JsonObject> getProduct(@RequestParam(value="id", required=false) Integer id) throws Exception {
         try {
             if (id == null) {
-                return new Answer(400, "Bad Request");
+                return new ResponseEntity<>(new Answer(400, "Bad Request"), HttpStatus.BAD_REQUEST);
             }
             else if (!dataKeeper.keeper.containsKey(id)) {
-                return new Answer(404, "Not Found");
+                return new ResponseEntity<>(new Answer(404, "Not Found"), HttpStatus.NOT_FOUND);
             }
 
-            return new Product(dataKeeper.getProduct(id).getId(), dataKeeper.getProduct(id).getName(),
-                    dataKeeper.getProduct(id).getPrice());
+            return new ResponseEntity<>(dataKeeper.getProduct(id), HttpStatus.OK);
         } catch (Exception e) {
-            return new Answer(404, "Not Found");
+            return new ResponseEntity<>(new Answer(404, "Not Found"), HttpStatus.NOT_FOUND);
         }
 
     }

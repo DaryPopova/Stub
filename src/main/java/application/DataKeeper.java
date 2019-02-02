@@ -9,7 +9,7 @@ public class DataKeeper {
         return keeper.get(id);
     }
 
-    public void addProduct(Integer id, String name, double price) throws Exception {
-        keeper.put(id, new Product(id, name, price));
+    public void addProduct(Product product) throws Exception {
+        keeper.put(product.getId(), product);
     }
 }
