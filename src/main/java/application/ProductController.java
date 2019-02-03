@@ -15,6 +15,9 @@ public class ProductController {
             if ((product.getId() == null) || (product.getName() == null) || (product.getPrice() == null)) {
                 return new ResponseEntity<>(new Answer(400, "Bad Request"), HttpStatus.BAD_REQUEST);
             }
+            if (product.getPrice() < 0) {
+                return new ResponseEntity<>(new Answer(500, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
             dataKeeper.addProduct(product);
             return new ResponseEntity<>(new Answer(200, "success"), HttpStatus.OK);
         } catch (Exception e) {
